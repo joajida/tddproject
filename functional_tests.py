@@ -28,21 +28,25 @@ class NewVisitorTest(unittest.TestCase):
 
 		#When we hit enter, the page updates and lists "peacock feathers" as a to-do item.
 		inputbox.send_keys(Keys.ENTER)
+
 		table=self.browser.find_element_by_id('id_list_table')
 		rows=table.find_elements_by_tag_name('tr')
-		self.assertTrue(
-			any(row.text=='1: Buy peacock feathers' for row in rows),
-			"New to-do item did not appear in table"
-			)
+		self.assertIn('1: Buy peacock feathers',[row.text for row in rows])
 
 		#We can add another item. Let's add "Use feathers to make a fly".
+		inputbox=self.browser.find_element_by_id('id_new_item')
+		inputbox.send_keys("Use feathers to make a fly")
+		inputbox.send_keys(Keys.ENTER)
+
+		#The page updates again and now lists both items.
+		table=self.browser.find_element_by_id('id_list_table')
+		rows=table.find_elements_by_tag_name('tr')
+		self.assertIn('1: Buy peacock feathers',[row.text for row in rows])
+		self.assertIn('2: Use feathers to make a fly',[row.text for row in rows])
+
+		#An explanatory text points out that the website has generated a unique URL for that to-do list. 
 		self.fail('Finish the test!')
-
-#The page updates again and now lists both items.
-
-#An explanatory text points out that the website has generated a unique URL for that to-do list. 
-
-#When we visit the URL, the to-do list is still there.
+		#When we visit the URL, the to-do list is still there.
 
 if __name__=='__main__':
 	unittest.main(warnings='ignore')
