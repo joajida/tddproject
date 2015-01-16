@@ -32,9 +32,11 @@ class NewVisitorTest(LiveServerTestCase):
 		#We want to buy peacock feathers. Let's type it into a text box.
 		inputbox.send_keys('Buy peacock feathers')
 
-		#When we hit enter, the page updates and lists "peacock feathers" as a to-do item.
+		#When we hit enter, we are taken to a new URL where "1: Buy peacock feathers" is an item in a to-do list.
 		inputbox.send_keys(Keys.ENTER)
+		list_url=self.browser.current_url
 
+		self.assertRegex(list_url,r'/lists/.+')
 		self.check_for_row_in_list_table("1: Buy peacock feathers")
 
 		#We can add another item. Let's add "Use feathers to make a fly".
@@ -46,9 +48,31 @@ class NewVisitorTest(LiveServerTestCase):
 		self.check_for_row_in_list_table("1: Buy peacock feathers")
 		self.check_for_row_in_list_table("2: Use feathers to make a fly")
 
-		#An explanatory text points out that the website has generated a unique URL for that to-do list. 
-		self.fail('Finish the test!')
-		#When we visit the URL, the to-do list is still there.
+		#A new user visits the site
+		self.browser.quit()
+		self.browser=webdriver.Chrome()
+
+		#When he visits the homepage, he sees no sign of our list
+		self.browser.get(self.live_server_url)
+		page_text=self.browser.find_element_by_tag_name('body').text
+		self.assertNotIn('Buy peacock feathers',page_text)
+		self.assertNotIn('make a fly',page_text)
+
+		#He starts a new list by entering an item
+		inputbox=self.browser.find_element_by_id('id_new_item')
+		inputbox.send_keys('Buy milk')
+		inputbox.send_keys(Keys.ENTER)
+
+		#He gets his own unique URL
+		user_list_url=self.browser.current_url
+		self.assertRegex(user_list_url,r'/lists/.+')
+		self.assertNotEqual(user_list_url,list_url)
+
+		#There is still no sign of our list
+		page_text=self.browser.find_element_by_tag_name('body').text
+
+		self.asserNotIn('Buy peacock feathers',page_text)
+		self.assertNotIn('make a fly',page_text)
 
 if __name__=='__main__':
 	unittest.main(warnings='ignore')
