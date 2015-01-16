@@ -71,7 +71,7 @@ class NewVisitorTest(LiveServerTestCase):
 		#There is still no sign of our list
 		page_text=self.browser.find_element_by_tag_name('body').text
 
-		self.asserNotIn('Buy peacock feathers',page_text)
+		self.assertNotIn('Buy peacock feathers',page_text)
 		self.assertNotIn('make a fly',page_text)
 
 if __name__=='__main__':
